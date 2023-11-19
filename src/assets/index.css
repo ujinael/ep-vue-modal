@@ -1,0 +1,5 @@
+@import "./transitions.css";
+:root {
+    --ep-header-bg-color: #5566aa;
+    --ep-header-text-color: #ffffff;
+}
