@@ -10,7 +10,7 @@ npm install ep-vue-modal
 
 2. 
 __in main.ts__ 
-```
+```c
     import 'ep-vue-modal/styles'
     import { installModalPlugin } from 'ep-vue-modal'
     ...
@@ -18,7 +18,7 @@ __in main.ts__
 ```
 3. 
 __in root component (typicaly App.vue)__
-    ```
+```c
     <template>
             ...your code
         <EPModalContainer/>
@@ -26,11 +26,11 @@ __in root component (typicaly App.vue)__
     <script setup>
     import {EPModalContainer} from 'ep-vue-modal'
     </script>
-    ```
+```
 
 ## Show modal
 __When you need open modal from any component in app__
-    ```
+```c
             <template>
                 <button @click="openModalHandler">
             </template>
@@ -49,11 +49,11 @@ __When you need open modal from any component in app__
             })
             }
             </script>
-    ```
+```
 
 ## Prevent close modal in your modal content component
 __in your modal content component__
-    ```
+```
         <template>
             <div> My modal content </div>
         </template>
@@ -66,4 +66,4 @@ __in your modal content component__
         hide()
         })
         </script>
-    ```
+```
