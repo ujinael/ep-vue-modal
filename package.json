@@ -7,8 +7,12 @@
   "files": [
     "dist"
   ],
+  "license": "LGPL-3.0-only",
   "main": "./dist/ep-vue-modal.js",
   "module": "./dist/ep-vue-modal.js",
+  "repository": {
+    "url": "https://github.com/ujinael/ep-vue-modal.git"
+  },
   "exports": {
     ".": {
       "import": "./dist/index.js",
