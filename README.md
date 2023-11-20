@@ -61,7 +61,7 @@ __in your modal content component__
         import { useModal } from 'ep-vue-modal'
         import YourModalComponent from '../../YourModalComponent.vue'
         const { closeHandler } = useModal()
-        closeHandler((hide,event:Evvent)=>{
+        closeHandler((hide,event:Event)=>{
         ...your logic before close modal
         hide()
         })

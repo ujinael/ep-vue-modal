@@ -6,29 +6,73 @@ import type {
   IModalContainer,
   IShowModalOptions
 } from '@/components/types'
-import { EPDefaultModal } from '../componets'
+import { EPModal, EPModalOverlay } from '../componets'
 
 export class ModalContainer implements IModalContainer {
+  private _defaultModal: new (...args: any[]) => Component
+  constructor(modal: new (...args: any[]) => Component = EPModal) {
+    this._defaultModal = markRaw(modal)
+  }
   modals: Array<IModal> = []
-
-  show<C extends Component>(content: C, props: ComponentProps<C>, options?: IShowModalOptions) {
-    const newModal = h(content, { ...props })
-    let header: Component | string | undefined = undefined
+  private renderModal<C extends Component>(
+    modalContent: C,
+    contentProps: ComponentProps<C> | null,
+    options?: IShowModalOptions
+  ) {
+    let modalTitle: string | undefined
+    let headerSlot: Component | undefined = undefined
+    let footerSlot: Component | undefined = undefined
     if (options && options.header) {
-      if (typeof options.header !== 'string') header = markRaw(options.header)
-      else header = options.header
+      if (typeof options.header === 'string') modalTitle = options.header
+      else headerSlot = options.header
     }
-    this.modals.push({
-      content: newModal,
-      closeHandler: options?.closeHandler ?? this.hide.bind(this),
-      header,
-      footer: options?.footer ? markRaw(options.footer) : undefined
-    })
+    if (options && options.footer) footerSlot = options.footer
+    const modal = h(
+      EPModalOverlay,
+      { onClose: () => this.hide() },
+      {
+        default: (props: { close: (event: Event) => void }) =>
+          h(
+            this._defaultModal,
+            { title: modalTitle, onClose: props.close },
+            {
+              header: headerSlot ? () => h(headerSlot!) : undefined,
+              default: () => h(modalContent, contentProps),
+              footer: footerSlot ? () => h(footerSlot!) : undefined
+            }
+          )
+      }
+    )
+    return modal
+  }
+  show<C extends Component>(
+    content: C,
+    props: ComponentProps<C> | null,
+    options?: IShowModalOptions
+  ) {
+    const newModal = this.renderModal(content, props, options)
+    this.modals.push(markRaw(newModal))
   }
 
   showDefault(options: IDefaultModalOptions) {
-    const newModal = h(EPDefaultModal, { ...options })
-    this.modals.push({ content: newModal, closeHandler: this.hide.bind(this) })
+    this.show(h('div', { class: 'ep_modal__confirm' }, [options.message]), null, {
+      header: options.title,
+      footer: options.buttons
+        ? () =>
+            h(
+              'div',
+              { class: 'ep_modal__confirm_controls' },
+              options.buttons?.map((btn) => {
+                if ('title' in btn) {
+                  return h('button', { class: 'ep_modal__button', onClick: btn.handler }, [
+                    btn.title
+                  ])
+                }
+                return markRaw(h(btn))
+              })
+            )
+        : undefined
+    })
   }
   hide() {
     if (this.modals.length) this.modals.pop()

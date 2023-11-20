@@ -1,5 +1,5 @@
 <template>
-  <div class="ep_modal" @click.stop>
+  <div ref="modalBody" class="ep_modal" @click.stop @keyup="onKeyUp">
     <div class="ep_modal__header">
       <slot name="header">
         <h4 class="ep_modal__title" v-if="title">{{ title }}</h4>
@@ -7,11 +7,14 @@
     </div>
     <CloseIcon class="close_icon" @click="closeHandler" />
 
-    <slot></slot>
+    <div class="ep_modal__content">
+      <slot class="ep_modal__content"></slot>
+    </div>
     <slot name="footer"></slot>
   </div>
 </template>
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
 import { CloseIcon } from './index'
 const emit = defineEmits<{
   (event: 'close', value: Event): void
@@ -19,10 +22,16 @@ const emit = defineEmits<{
 defineProps<{
   title?: string
 }>()
-
+const onKeyUp = (event: KeyboardEvent) => {
+  if (event.code === 'Escape') {
+    closeHandler(event)
+  }
+}
 const closeHandler = (event: Event) => {
   emit('close', event)
 }
+const modalBody = ref<HTMLDivElement>()
+onMounted(() => modalBody.value?.focus())
 </script>
 <style scoped lang="scss">
 @keyframes fromup {
@@ -39,11 +48,14 @@ const closeHandler = (event: Event) => {
   }
 }
 .ep_modal__header {
+  min-height: 2rem;
   padding: 0.25em;
   display: flex;
   justify-content: center;
   background-color: var(--ep-header-bg-color);
   color: var(--ep-header-text-color);
+  border-top-right-radius: var(--ep-modal-border-radius);
+  border-top-left-radius: var(--ep-modal-border-radius);
 }
 .ep_modal__title {
   text-align: center;
@@ -53,8 +65,12 @@ const closeHandler = (event: Event) => {
   animation: fromup 0.3s ease-in 1;
   height: 100%;
   width: 100%;
-  background-color: white;
+  background-color: var(--ep-modal-bg-color);
   position: relative;
+  overflow: hidden;
+}
+.ep_modal__content {
+  padding: var(--ep-modal-content-padding);
 }
 .close_icon {
   width: 15px;
@@ -62,7 +78,7 @@ const closeHandler = (event: Event) => {
   position: absolute;
   top: 10px;
   right: 10px;
-  color: #ffffff;
+  color: var(--ep-header-text-color);
   &:hover {
     cursor: pointer;
     opacity: 0.7;
@@ -73,7 +89,7 @@ const closeHandler = (event: Event) => {
     min-width: 350px;
     width: fit-content;
     height: fit-content;
-    border-radius: var(--common_border-radius);
+    border-radius: var(--ep-modal-border-radius);
   }
 }
 </style>
